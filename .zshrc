@@ -2,18 +2,33 @@ export ZSH="/Users/fabiana/.oh-my-zsh"
 
 ZSH_THEME="dracula"
 
-plugins=(git)
+ZSH_DISABLE_COMPFIX=false
+
+plugins=()
 
 source $ZSH/oh-my-zsh.sh
 
 export ZSH_PROMPT=$PROMPT
 kubeContext='$(kubectl config current-context)'
+kubeNamespace='$(kubens -c)'
 account='$(cat ~/.vtex/session/session.json | jq '.account' -r)'
 workspace='$(cat ~/.vtex/session/workspace.json | jq '.currentWorkspace' -r)'
-export PROMPT='%F{magenta}%B'$kubeContext' ~ '$account'/'$workspace'%f%b '$ZSH_PROMPT''
+export PROMPT='%F{111}%B'$kubeContext' ('$kubeNamespace')%F{172}%B ['$account'/'$workspace']%f%b '$ZSH_PROMPT''
 function dp() {
 	export PROMPT=$ZSH_PROMPT
 }
+
+function knewctx() {
+	if [ -z "$1" ]
+	then
+		echo "knewctx {{CLUSTER}} {{SERVER}} {{TOKEN}}"
+		return
+	fi
+	kubectl config set-cluster $1 --server=$2
+	kubectl config set-credentials $1 --token=$3
+	kubectl config set-context $1 --cluster=$1 --user=$1
+}
+
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
@@ -43,7 +58,7 @@ alias gro="git rebase --onto "
 alias gl="git log --all --decorate --oneline --graph"
 
 # conda aliases
-alias pads="conda activate master"
+alias padsenv="conda activate master"
 alias envfile="conda env export > environment.yml"
 function envcreate() {}
 
