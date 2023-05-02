@@ -4,7 +4,7 @@ ZSH_THEME="dracula"
 ZSH_DISABLE_COMPFIX=true
 
 plugins=(
-	zsh-syntax-highlighting 
+	zsh-syntax-highlighting
 	history-substring-search
 	aws
 )
@@ -16,6 +16,9 @@ bindkey '[C' forward-word
 bindkey '[D' backward-word
 
 export ZSH_PROMPT=$PROMPT
+export GOPATH="$HOME/go"
+
+
 kubeContext='$(kubectl config current-context)'
 kubeNamespace='$(kubens -c)'
 account='$(cat ~/.vtex/session/session.json | jq '.account' -r)'
@@ -38,6 +41,30 @@ function knewctx() {
 	kubectl config set-context $1 --cluster=$1 --user=$1
 }
 
+function lk8() {
+  clientid="$1"
+  clientenv="$2"
+  if [[ -z $clientid || -z $clientenv ]]
+  then
+    echo 'usage: lk8 <clientid> <cluster_name>'
+    return
+  fi
+
+  export KUBECONFIG=~/.clustersconfigs/kubeconfigs/$1-$2-kubeconfig
+}
+
+export TEST_RANCHER_TOKEN=kubeconfig-u-iczhfeijqv:dq4jtsl6cpn4ffsm5g4jr45ggsnmht5r2rgr9mhgd4n7nrf4jqq64g
+
+# router alias
+alias rl="router-link -solution-root=/Users/fabiana/Documents/kube-router/src/Vtex.Kube.Router "
+
+# kubectl alias
+alias curlpod="kubectl run fabi --rm -it --image odise/busybox-curl -- /bin/sh"
+alias k="kubectl "
+alias kg="kubectl get "
+alias kd="kubectl describe "
+alias kgpo="kubectl get pods"
+alias kgd="kubectl get deployment "
 
 # kubectl alias
 alias curlpod="kubectl run fabi --rm -it --image odise/busybox-curl -- /bin/sh"
@@ -80,6 +107,7 @@ alias lg=!"git lg1"
 
 # go aliases
 alias goprojects="cd /Users/fabiana/go/src/github.com/FabianaFerreira"
+alias govtex="cd $GOPATH/src/github.com/vtex/"
 
 # conda aliases
 alias padsenv="conda activate trypanosoma-project"
@@ -108,3 +136,5 @@ export PATH="$PATH:$GOPATH/bin"
 if [ /usr/local/bin/kubectl ]; then source <(kubectl completion zsh); fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
